@@ -13,7 +13,6 @@ WITH lk_test_coordinates AS (
   ) AS stg
   WHERE
     stg.ranking = 1
-    --timestamp-- AND stg.mdmCounterForEntity > {{start_from}}
 ),
 
 test_coordinates AS (
@@ -32,7 +31,7 @@ test_coordinates AS (
         (address[SAFE_ORDINAL(1)].city) AS mdmcity,
         (address[SAFE_ORDINAL(1)].state) AS mdmstate,
         (address[SAFE_ORDINAL(1)].country) AS mdmcountry,
-        (address[SAFE_ORDINAL(1)].coordinates) AS mdmcoordinates
+        NULL AS mdmcoordinates
     ) AS mdmaddress
     --metadata--
   FROM
