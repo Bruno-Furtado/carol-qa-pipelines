@@ -20,8 +20,8 @@ test_coordinates AS (
   SELECT
     stg.id as mdmpkid,
     stg.name AS mdmname,
-    NULL AS mdmcoordinates,
-    stg.coordinates_string AS coordinates2
+    stg.coordinates AS mdmcoordinates,
+    NULL AS coordinates2
     --metadata--
   FROM
     lk_test_coordinates AS stg
