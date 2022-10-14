@@ -1,0 +1,40 @@
+lk_test_coordinates AS (
+  SELECT
+    stg.*
+  FROM
+  (
+    SELECT
+      t.*,
+      ROW_NUMBER() OVER (PARTITION BY t.mdmTenantId, t.id ORDER BY t.mdmCounterForEntity DESC) AS ranking
+    FROM
+      stg_test_coordinates_test_coordinates AS t
+    WHERE
+      t.mdmDeleted IS NULL OR t.mdmDeleted = FALSE
+  ) AS stg
+  WHERE
+    stg.ranking = 1
+    --timestamp-- AND stg.mdmCounterForEntity > {{start_from}}
+),
+
+test_coordinates AS (
+  SELECT
+    stg.mdmTenantId as tenantid,
+    stg.route_id AS routeid,
+    stg.airline_id AS airlineid,
+    lines.name AS airlinename,
+    stg.source_airport_id AS sourceairportid,
+    sports.name AS sourceairportname,
+    stg.destination_airport_id AS destinationairportid,
+    dports.name AS destinationairportname
+    --metadata--
+  FROM
+    lk_test_coordinates AS stg
+)
+
+SELECT
+    *,
+    (
+      (mdmpkid IS NULL OR LENGTH(TRIM(mdmpkid)) = 0)
+    ) AS mdmDeleted
+FROM
+  test_coordinates

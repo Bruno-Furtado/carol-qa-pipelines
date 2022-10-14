@@ -1,0 +1,36 @@
+{
+    "defaults":
+    {
+        "cronExpressions":
+        [
+            "0 0/5 * ? * * *"
+        ],
+        "prepareScripts":[]
+    },
+    "pipelines":
+    [
+        {
+            "pipelineName": "testcoordinates",
+            "pipelineDescription": "",
+            "outputDataModelName": "testcoordinates",
+            "overlapDeltaMinutes": 60,
+            "saveToCds": true,
+            "saveToUnified": true,
+            "saveToRealtime": false,
+            "sendToSubscriptions": false,
+            "timeZone": "America/Sao_Paulo",
+            "processScript": "coordinates/testcoordinates.csql",
+            "sourceEntities":
+            {
+                "dataModels": [],
+                "stagings":
+                [
+                    {
+                        "connectorName": "test_coordinates",
+                        "stagingName": "test_coordinates"
+                    }
+                ]
+            }
+        }
+    ]
+}
