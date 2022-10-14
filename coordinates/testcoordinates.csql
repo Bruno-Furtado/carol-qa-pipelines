@@ -9,7 +9,7 @@ CREATE TEMP FUNCTION GeopointStringFromGeography(coord GEOGRAPHY) RETURNS GEOGRA
 
 CREATE TEMP FUNCTION GeopointStringFromString(str STRING) RETURNS STRING AS (
   IF(
-    str IS NULL OR LENGTH(TRIM(str)) = 0,
+    (str IS NULL) OR (LENGTH(TRIM(str)) = 0) OR CONTAINS_SUBSTR(str, ',') = FALSE,
     CAST(NULL AS STRING),
     str
   )
