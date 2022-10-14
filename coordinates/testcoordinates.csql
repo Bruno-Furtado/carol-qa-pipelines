@@ -18,14 +18,10 @@ WITH lk_test_coordinates AS (
 
 test_coordinates AS (
   SELECT
-    stg.mdmTenantId as tenantid,
-    stg.route_id AS routeid,
-    stg.airline_id AS airlineid,
-    lines.name AS airlinename,
-    stg.source_airport_id AS sourceairportid,
-    sports.name AS sourceairportname,
-    stg.destination_airport_id AS destinationairportid,
-    dports.name AS destinationairportname
+    stg.id as mdmpkid,
+    stg.name AS mdmname,
+    stg.coordinates AS mdmcoordinates,
+    stg.coordinates_string AS coordinates2
     --metadata--
   FROM
     lk_test_coordinates AS stg
