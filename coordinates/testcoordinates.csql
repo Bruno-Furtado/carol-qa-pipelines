@@ -1,20 +1,17 @@
 -- FUNCTIONS
 
-CREATE TEMP FUNCTION GenerateGeographyFromGeography(coord GEOGRAPHY) RETURNS GEOGRAPHY AS (
+CREATE TEMP FUNCTION GeopointStringFromGeography(coord GEOGRAPHY) RETURNS GEOGRAPHY AS (
   IFNULL(
     coord,
     CAST(NULL AS GEOGRAPHY)
   )
 );
 
-CREATE TEMP FUNCTION GenerateGeographyFromString(str STRING) RETURNS GEOGRAPHY AS (
+CREATE TEMP FUNCTION GeopointStringFromString(str STRING) RETURNS STRING AS (
   IF(
     str IS NULL OR LENGTH(TRIM(str)) = 0,
-    CAST(NULL AS GEOGRAPHY),
-    ST_GEOGPOINT(
-      CAST(SPLIT(TRIM(str), ',')[SAFE_ORDINAL(2)] AS FLOAT64),
-      CAST(SPLIT(TRIM(str), ',')[SAFE_ORDINAL(1)]  AS FLOAT64)
-    )
+    CAST(NULL AS STRING),
+    str
   )
 );
 
@@ -41,8 +38,8 @@ test_coordinates AS (
   SELECT
     stg.id as mdmpkid,
     stg.name AS mdmname,
-    GenerateGeographyFromGeography(stg.coordinates) AS mdmcoordinates,
-    GenerateGeographyFromString(stg.coordinates_string) AS coordinates2,
+    GeopointStringFromGeography(stg.coordinates) AS mdmcoordinates,
+    GeopointStringFromString(stg.coordinates_string) AS coordinates2,
     ARRAY(
       SELECT AS STRUCT
         (address[SAFE_ORDINAL(1)].addresstype) AS mdmaddresstype,
@@ -53,7 +50,7 @@ test_coordinates AS (
         (address[SAFE_ORDINAL(1)].city) AS mdmcity,
         (address[SAFE_ORDINAL(1)].state) AS mdmstate,
         (address[SAFE_ORDINAL(1)].country) AS mdmcountry,
-        GenerateGeographyFromString(address[SAFE_ORDINAL(1)].coordinates) AS mdmcoordinates
+        GeopointStringFromString(address[SAFE_ORDINAL(1)].coordinates) AS mdmcoordinates
     ) AS mdmaddress
     --metadata--
   FROM
