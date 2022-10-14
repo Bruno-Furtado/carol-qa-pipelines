@@ -1,9 +1,10 @@
 -- FUNCTIONS
 
 CREATE TEMP FUNCTION GeopointStringFromGeography(coord GEOGRAPHY) RETURNS GEOGRAPHY AS (
-  IFNULL(
-    coord,
-    CAST(NULL AS GEOGRAPHY)
+  IF(
+    (coord IS NULL) OR (ST_X(coord) IS NULL) OR (ST_Y(coord) IS NULL),
+    CAST(NULL AS GEOGRAPHY),
+    coord
   )
 );
 
@@ -64,3 +65,5 @@ SELECT
     ) AS mdmDeleted
 FROM
   test_coordinates
+ORDER BY
+  mdmpkid
