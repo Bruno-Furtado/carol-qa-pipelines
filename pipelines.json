@@ -16,7 +16,7 @@
             "overlapDeltaMinutes": 60,
             "saveToCds": true,
             "saveToUnified": true,
-            "saveToRealtime": false,
+            "saveToRealtime": true,
             "sendToSubscriptions": false,
             "timeZone": "America/Sao_Paulo",
             "processScript": "coordinates/testcoordinates.csql",
