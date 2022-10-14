@@ -1,3 +1,25 @@
+-- FUNCTIONS
+
+CREATE TEMP FUNCTION GenerateGeographyFromGeography(coord GEOGRAPHY) RETURNS GEOGRAPHY AS (
+  IFNULL(
+    coord,
+    CAST(NULL AS GEOGRAPHY)
+  )
+);
+
+CREATE TEMP FUNCTION GenerateGeographyFromString(str STRING) RETURNS GEOGRAPHY AS (
+  IF(
+    str IS NULL OR LENGTH(TRIM(str)) = 0,
+    CAST(NULL AS GEOGRAPHY),
+    ST_GEOGPOINT(
+      CAST(SPLIT(TRIM(str), ',')[SAFE_ORDINAL(2)] AS FLOAT64),
+      CAST(SPLIT(TRIM(str), ',')[SAFE_ORDINAL(1)]  AS FLOAT64)
+    )
+  )
+);
+
+-- QUERIES
+
 WITH lk_test_coordinates AS (
   SELECT
     stg.*
@@ -7,20 +29,21 @@ WITH lk_test_coordinates AS (
       t.*,
       ROW_NUMBER() OVER (PARTITION BY t.mdmTenantId, t.id ORDER BY t.mdmCounterForEntity DESC) AS ranking
     FROM
-      stg_test_coordinates_test_coordinates AS t
+      `carol-0e2110b1928447b9b066.0e2110b1928447b9b066f5ba078ddeb2`.stg_test_coordinates_test_coordinates AS t
     WHERE
       t.mdmDeleted IS NULL OR t.mdmDeleted = FALSE
   ) AS stg
   WHERE
     stg.ranking = 1
+    --timestamp-- AND stg.mdmCounterForEntity > {{start_from}}
 ),
 
 test_coordinates AS (
   SELECT
     stg.id as mdmpkid,
     stg.name AS mdmname,
-    NULL AS mdmcoordinates,
-    NULL AS coordinates2,
+    GenerateGeographyFromGeography(stg.coordinates) AS mdmcoordinates,
+    GenerateGeographyFromString(stg.coordinates_string) AS coordinates2,
     ARRAY(
       SELECT AS STRUCT
         (address[SAFE_ORDINAL(1)].addresstype) AS mdmaddresstype,
@@ -31,7 +54,7 @@ test_coordinates AS (
         (address[SAFE_ORDINAL(1)].city) AS mdmcity,
         (address[SAFE_ORDINAL(1)].state) AS mdmstate,
         (address[SAFE_ORDINAL(1)].country) AS mdmcountry,
-        NULL AS mdmcoordinates
+        GenerateGeographyFromString(address[SAFE_ORDINAL(1)].coordinates) AS mdmcoordinates
     ) AS mdmaddress
     --metadata--
   FROM
