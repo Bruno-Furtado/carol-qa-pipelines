@@ -29,13 +29,12 @@ WITH lk_test_coordinates AS (
       t.*,
       ROW_NUMBER() OVER (PARTITION BY t.mdmTenantId, t.id ORDER BY t.mdmCounterForEntity DESC) AS ranking
     FROM
-      `carol-0e2110b1928447b9b066.0e2110b1928447b9b066f5ba078ddeb2`.stg_test_coordinates_test_coordinates AS t
+      stg_test_coordinates_test_coordinates AS t
     WHERE
       t.mdmDeleted IS NULL OR t.mdmDeleted = FALSE
   ) AS stg
   WHERE
     stg.ranking = 1
-    --timestamp-- AND stg.mdmCounterForEntity > {{start_from}}
 ),
 
 test_coordinates AS (
